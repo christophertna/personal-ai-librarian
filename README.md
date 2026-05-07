@@ -10,17 +10,17 @@ ai-librarian/
 ├── backend/
 │   ├── server.js              ← Entry point. Sets up Express.
 │   ├── routes/
-│   │   ├── auth.js            ← Login/register routes (YOU WILL CODE THIS)
-│   │   ├── documents.js       ← Upload/ingest documents (YOU WILL CODE THIS)
-│   │   └── ask.js             ← The main RAG question route (YOU WILL CODE THIS)
+│   │   ├── auth.js            ← Login/register routes 
+│   │   ├── documents.js       ← Upload/ingest documents 
+│   │   └── ask.js             ← The main RAG question route 
 │   ├── middleware/
-│   │   └── authMiddleware.js  ← Protects routes with JWT (YOU WILL CODE THIS)
+│   │   └── authMiddleware.js  ← Protects routes with JWT 
 │   ├── db/
 │   │   └── connection.js      ← MySQL connection setup
 │   └── services/
-│       ├── retrieval.js       ← Searches MySQL for relevant chunks (YOU WILL CODE THIS)
-│       ├── augmentation.js    ← Builds the prompt for Gemini (YOU WILL CODE THIS)
-│       └── gemini.js          ← Calls the Gemini API (YOU WILL CODE THIS)
+│       ├── retrieval.js       ← Searches MySQL for relevant chunks 
+│       ├── augmentation.js    ← Builds the prompt for Gemini (anything gemini named is just OpenAI instead)
+│       └── gemini.js          ← Calls the OpenAI API (originally gemini, but had too many issues)
 ├── frontend/
 │   ├── index.html             ← Login page
 │   ├── pages/
@@ -28,7 +28,7 @@ ai-librarian/
 │   │   └── ask.html           ← Ask questions page
 │   └── styles/
 │       └── main.css           ← Tailwind + custom styles
-├── .env                       ← Your secrets (never commit this!)
+├── .env                       
 └── package.json
 ```
 
