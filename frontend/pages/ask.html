@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Librarian — Ask</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+  <!-- Nav -->
+  <nav class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-xl">📚</span>
+      <span class="font-semibold text-slate-800">AI Librarian</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span id="username-display" class="text-sm text-slate-500"></span>
+      <a href="/pages/library.html" class="text-sm text-slate-600 hover:text-slate-900">My Library</a>
+      <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700">Logout</button>
+    </div>
+  </nav>
+
+  <main class="max-w-2xl mx-auto px-4 py-10">
+
+    <h1 class="text-2xl font-semibold text-slate-800 mb-2">Ask your library</h1>
+    <p class="text-slate-500 text-sm mb-8">Questions are answered using only your uploaded documents.</p>
+
+    <!-- Question input -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
+      <textarea id="question-input" rows="3" placeholder="What were the main risks we identified in March?"
+        class="w-full text-sm text-slate-800 resize-none focus:outline-none placeholder-slate-400"></textarea>
+      <div class="flex justify-end mt-3">
+        <button onclick="askQuestion()"
+          class="bg-slate-800 text-white text-sm font-medium px-5 py-2 rounded-lg hover:bg-slate-700 transition">
+          Ask ✦
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading state (hidden by default) -->
+    <div id="loading" class="hidden text-center text-slate-400 text-sm py-8">
+      <div class="text-2xl mb-2">🔍</div>
+      Searching your library and thinking...
+    </div>
+
+    <!-- Answer area (hidden by default) -->
+    <div id="answer-area" class="hidden">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-4">
+        <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Answer</h2>
+        <p id="answer-text" class="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap"></p>
+      </div>
+
+      <!-- Sources used -->
+      <div id="sources-area" class="hidden">
+        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 px-1">Sources used</h3>
+        <div id="sources-list" class="space-y-2"></div>
+      </div>
+    </div>
+
+    <!-- Error area (hidden by default) -->
+    <div id="error-area" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3"></div>
+
+  </main>
+
+  <script>
+    // Check login on page load
+    const token    = localStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    if (!token) window.location.href = '/'; // redirect to login if no token (not logged in yet)
+    document.getElementById('username-display').textContent = username || '';
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      window.location.href = '/'; // redirect to login page
+    }
+
+    async function askQuestion() {
+      const question = document.getElementById('question-input').value.trim(); // get the question text
+      if (!question) return; // don't do anything if the input is empty
+
+      // Reset UI
+      document.getElementById('answer-area').classList.add('hidden');
+      document.getElementById('error-area').classList.add('hidden');
+      document.getElementById('loading').classList.remove('hidden');
+
+  
+      // POST to /api/ask with the question.
+      // On success (data.answer):
+      //   - Hide #loading
+      //   - Show #answer-area
+      //   - Set #answer-text content to data.answer
+      //   - If data.sources has items, show #sources-area and render them
+      //
+      // On error:
+      //   - Hide #loading
+      //   - Show #error-area with the error message
+
+      try {
+
+        const res = await fetch('/api/ask', {
+
+          method: 'POST',
+
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+
+          },
+
+          body: JSON.stringify({ question })
+
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+
+          throw new Error(data.message);
+        }
+
+        // Success
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('answer-area').classList.remove('hidden');
+        document.getElementById('answer-text').textContent = data.answer;
+
+        if (data.sources && data.sources.length > 0) {
+
+          document.getElementById('sources-area').classList.remove('hidden');
+
+          renderSources(data.sources);
+        }
+      
+      } catch (error) {
+
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error-area').classList.remove('hidden');
+        document.getElementById('error-area').textContent = error.message;
+      }
+
+
+      }
+
+
+  
+
+    function renderSources(sources) {
+
+      // This function renders the source citations below the answer.
+      // Each source should show the document title and a short snippet.
+
+      // Build and render sources HTML
+      let html = '';
+      /*
+      Starts with an empty string. 
+      You'll build up the HTML by adding to it piece by piece. 
+      Notice it's let not const — because you're going to keep adding to it in the loop, so it needs to be reassignable.
+      */
+      sources.forEach(source => {
+        /*
+        Loops through every source in the array. 
+        Similar to the .map() you used in ask.js, but instead of returning a new array, forEach just runs code for each item. 
+        source is each individual object with title and snippet.
+        */
+
+        // += means "add this to what's already in html". So after 3 sources, html contains 3 divs concatenated together as one big string.
+        html += `
+          <div class="bg-slate-50 rounded-lg border border-slate-200 p-3">
+            <div class="text-xs font-semibold text-slate-600">${source.title}</div>
+            <div class="text-xs text-slate-400 mt-1">${source.snippet}</div>
+          </div>
+        `;
+        
+        // The ${source.title} and ${source.snippet} inject the actual values from each source object directly into the HTML string.
+        
+      });
+      document.getElementById('sources-list').innerHTML = html;
+      /*
+      document is the browser's global object representing the entire page — like window is the browser, document is the HTML inside it.
+      .getElementById finds the element with that id in your HTML. 
+      .innerHTML sets its content to your built string. So after this line, the sources section on screen shows all three source cards.
+      */
+
+      document.getElementById('sources-area').classList.remove('hidden'); // Otherwise the sources div will be populated but invisible!
+
+    }
+  </script>
+</body>
+</html>

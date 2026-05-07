@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Librarian — Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 w-full max-w-sm">
+
+    <div class="text-center mb-8">
+      <div class="text-4xl mb-2">📚</div>
+      <h1 class="text-2xl font-semibold text-slate-800">AI Librarian</h1>
+      <p class="text-slate-500 text-sm mt-1">Your personal document assistant</p>
+    </div>
+
+    <!-- Error message (hidden by default) -->
+    <div id="error-msg" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4"></div>
+
+    <!-- Tab switcher -->
+    <div class="flex bg-slate-100 rounded-lg p-1 mb-6">
+      <button id="tab-login"    onclick="showTab('login')"
+        class="flex-1 text-sm font-medium py-2 rounded-md bg-white shadow-sm text-slate-800 transition">
+        Login
+      </button>
+      <button id="tab-register" onclick="showTab('register')"
+        class="flex-1 text-sm font-medium py-2 rounded-md text-slate-500 transition">
+        Register
+      </button>
+    </div>
+
+    <form id="auth-form" onsubmit="handleSubmit(event)" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+        <input id="username" type="text" required placeholder="your_username"
+          class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+        <input id="password" type="password" required placeholder="••••••••"
+          class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400" />
+      </div>
+      <button type="submit"
+        class="w-full bg-slate-800 text-white rounded-lg py-2 text-sm font-medium hover:bg-slate-700 transition">
+        <span id="submit-label">Login</span>
+      </button>
+    </form>
+
+  </div>
+
+  <script>
+    let currentTab = 'login';
+
+    function showTab(tab) {
+      currentTab = tab;
+      const isLogin = tab === 'login';
+
+      document.getElementById('submit-label').textContent = isLogin ? 'Login' : 'Create Account';
+      document.getElementById('tab-login').className    = `flex-1 text-sm font-medium py-2 rounded-md transition ${isLogin ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500'}`;
+      document.getElementById('tab-register').className = `flex-1 text-sm font-medium py-2 rounded-md transition ${!isLogin ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500'}`;
+      document.getElementById('error-msg').classList.add('hidden');
+    }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const errorEl  = document.getElementById('error-msg');
+      errorEl.classList.add('hidden');
+
+
+      // Call the correct API endpoint based on currentTab.
+
+      try {
+
+        // LOGIN
+        if ( currentTab === 'login' ) {
+
+              const res = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, password })
+
+              /*
+              What is JSON.stringify?
+              fetch can only send text over the network, not JavaScript objects. JSON.stringify converts your object into a JSON string:
+
+              javascript{ username: "alice", password: "123" }  // JavaScript object
+              '{"username":"alice","password":"123"}' // after JSON.stringify — sendable text
+              On the other end, Express with express.json() middleware automatically converts it back into an object for req.body.
+              */
+            })
+
+            const data = await res.json();
+
+            if (!res.ok) {
+
+            errorEl.textContent = data.message;
+            errorEl.classList.remove('hidden');
+            return;
+          }
+
+            /*
+            Browser's built-in small storage — it survives page refreshes and navigation. 
+            You're using it like a wallet to carry the token between pages:
+            */
+            localStorage.setItem('token', data.token); // save to wallet
+            localStorage.setItem('username', data.username);
+
+            /*
+            localStorage.setItem('token', data.token);     // save to wallet
+            localStorage.getItem('token');                 // read from wallet (used in ask.html)
+            localStorage.removeItem('token');              // empty wallet (logout)
+            */
+
+            window.location.href = '/pages/ask.html';
+            /*
+            window is the browser itself — a global object like process is in Node.js. location.href is the current URL. 
+            
+            Setting it redirects the user:
+            javascriptwindow.location.href = '/pages/ask.html';  // navigate to ask page
+            */
+
+
+          }
+
+        // REGISTER
+        if (currentTab === 'register') {
+
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            errorEl.textContent = data.message;
+            errorEl.classList.remove('hidden');
+            return;
+          }
+
+          // success — switch to login tab with a hint
+          showTab('login');
+          errorEl.textContent = 'Account created! Please log in.';
+          errorEl.classList.remove('hidden');
+          errorEl.style.color = 'green';
+        }
+
+      } catch (error) {
+
+        errorEl.textContent = error.message;
+        errorEl.classList.remove('hidden');
+      }
+
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Librarian — My Library</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+  <!-- Nav -->
+  <nav class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-xl">📚</span>
+      <span class="font-semibold text-slate-800">AI Librarian</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="/pages/ask.html" class="text-sm text-slate-600 hover:text-slate-900">Ask Questions</a>
+      <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700">Logout</button>
+    </div>
+  </nav>
+
+  <main class="max-w-2xl mx-auto px-4 py-10">
+
+    <h1 class="text-2xl font-semibold text-slate-800 mb-2">My Library</h1>
+    <p class="text-slate-500 text-sm mb-8">Add documents here. The AI will only know what's in your library.</p>
+
+    <!-- Upload form -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
+      <h2 class="text-sm font-semibold text-slate-700 mb-4">Add a Document</h2>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Document Title</label>
+          <input id="doc-title" type="text" placeholder="e.g. Project Notes March 2024"
+            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Document Content</label>
+          <p class="text-xs text-slate-400 mb-2">Paste any text — meeting notes, reports, research, anything you want to ask about.</p>
+          <textarea id="doc-content" rows="8" placeholder="Paste your document text here..."
+            class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 resize-none"></textarea>
+        </div>
+      </div>
+
+      <div id="upload-msg" class="hidden mt-3 text-sm"></div>
+
+      <button onclick="uploadDocument()"
+        class="mt-4 bg-slate-800 text-white text-sm font-medium px-5 py-2 rounded-lg hover:bg-slate-700 transition">
+        Add to Library
+      </button>
+    </div>
+
+    <!-- Document list -->
+    <h2 class="text-sm font-semibold text-slate-700 mb-3">Your Documents</h2>
+    <div id="doc-list" class="space-y-2">
+      <p class="text-slate-400 text-sm">Loading...</p>
+    </div>
+
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/';
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      window.location.href = '/';
+    }
+
+    // Load documents when page opens
+    loadDocuments();
+
+    async function loadDocuments() {
+      // TODO: Fetch GET /api/documents and render the list.
+      //
+      // HINT: Same pattern — include Authorization header.
+      // On success, call renderDocuments(data)
+  
+
+      // TODO: Implement fetch and call renderDocuments()
+
+      try {
+        const response = await fetch('/api/documents', {
+          method: 'GET',
+
+          headers: {
+            'Authorization': `Bearer ${token}`
+
+          }
+        });
+
+        if (!response.ok) throw new Error('Failed to load documents');
+
+        const data = await response.json();
+
+        renderDocuments(data);
+
+      } catch (error) {
+
+        console.error('Error loading documents:', error);
+        const container = document.getElementById('doc-list');
+        container.innerHTML = `<p class="text-slate-400 text-sm">Failed to load documents. Please try again later.</p>`;
+      }
+
+    }
+
+    function renderDocuments(documents) {
+      const container = document.getElementById('doc-list');
+      // If documents is empty, show a friendly message.
+      // Otherwise, build HTML for each document.
+
+      // Render the documents list
+      if (documents.length === 0) {
+        container.innerHTML = `<p class="text-slate-400 text-sm">Your library is empty. Add some documents to get started!</p>`;
+        return;
+      }
+
+      let html = '';
+      documents.forEach(doc => {
+        html += `
+          <div class="bg-white rounded-xl border border-slate-200 px-4 py-3 flex items-center justify-between">
+            <div>
+              <div class="text-sm font-medium text-slate-700">${doc.title}</div>
+              <div class="text-xs text-slate-400">${doc.created_at}</div>
+            </div>
+            <span class="text-xs text-slate-300">📄</span>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+
+    }
+
+    async function uploadDocument() {
+      const title   = document.getElementById('doc-title').value.trim();
+      const content = document.getElementById('doc-content').value.trim();
+      const msgEl   = document.getElementById('upload-msg');
+
+      msgEl.classList.add('hidden');
+
+      // POST to /api/documents/ingest with { title, content }
+      //
+      // On success:
+      //   - Clear the form inputs
+      //   - Show a success message in #upload-msg
+      //   - Reload the documents list (call loadDocuments())
+
+      try {
+        
+      const response = await fetch('/api/documents/ingest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ title, content })
+      });
+
+      const data = await response.json();  // read the response
+
+      if (!response.ok) {                  // check if server returned an error
+        throw new Error(data.message);
+      }
+
+      // success — clear the form
+      document.getElementById('doc-title').value = '';
+      document.getElementById('doc-content').value = '';
+
+      // show success message
+      msgEl.className = 'text-sm text-green-600';
+      msgEl.textContent = `Document added! Split into ${data.chunks} chunks.`;
+      msgEl.classList.remove('hidden');
+
+      // reload the list so the new document appears
+      loadDocuments();
+
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      msgEl.className = 'text-sm text-red-600';
+      msgEl.textContent = 'Failed to upload document. Please try again.';
+      msgEl.classList.remove('hidden');
+    }
+
+    }
+  </script>
+</body>
+</html>
