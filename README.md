@@ -56,10 +56,8 @@ RAG:        User question → Search your DB for relevant text/chunks of texts f
 
 ## In Action
 <img width="1919" height="911" alt="Upload Documents" src="https://github.com/user-attachments/assets/6f47660b-4037-4728-84a1-52646fde5ad6" />
-
-
-
-
+<br>
+<br>
 <img width="1919" height="904" alt="Question Asked" src="https://github.com/user-attachments/assets/da81ab23-95c0-4162-b3f9-d66b3d98843d" />
 
 
