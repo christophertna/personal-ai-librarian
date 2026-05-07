@@ -1,6 +1,6 @@
 # 📚 Personal AI Librarian
 
-A beginner-friendly RAG (Retrieval-Augmented Generation) app.
+A beginner/simple Retrieval-Augmented Generation (RAG) application.
 You ask questions. It searches your document library. It gives an AI model (OpenAI in this case) the right context to answer accurately.
 
 ## Project Structure
@@ -8,7 +8,7 @@ You ask questions. It searches your document library. It gives an AI model (Open
 ```
 ai-librarian/
 ├── backend/
-│   ├── server.js              ← Entry point. Sets up Express.
+│   ├── server.js              ← Entry point, sets up Express.
 │   ├── routes/
 │   │   ├── auth.js            ← Login/register routes 
 │   │   ├── documents.js       ← Upload/ingest documents 
@@ -32,13 +32,13 @@ ai-librarian/
 └── package.json
 ```
 
-## How RAG Works (The Big Idea)
+## How RAG Works (Concept)
 
-Normal AI: User question → AI answers from memory (can hallucinate)
+Normal AI: User question → AI answers from memory (can hallucinate/answers too generally)
 
-RAG:        User question → Search your DB for relevant text
-                         → Give that text to the AI as context
-                         → AI answers ONLY from that context (accurate!)
+RAG:        User question → Search your DB for relevant text/chunks of texts from uploaded documents
+                         → Give texts/chunks to the AI as context
+                         → AI answers ONLY from that specific context only
 
 ## Setup Steps
 
