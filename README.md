@@ -1,7 +1,7 @@
 # 📚 Personal AI Librarian
 
 A beginner-friendly RAG (Retrieval-Augmented Generation) app.
-You ask questions. It searches your document library. It gives Gemini the right context to answer accurately.
+You ask questions. It searches your document library. It gives an AI model (OpenAI in this case) the right context to answer accurately.
 
 ## Project Structure
 
