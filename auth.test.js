@@ -134,4 +134,11 @@ afterAll(async () => {
   await request(BASE_URL)
     .delete('/api/auth/user')
     .set('Authorization', `Bearer ${token}`);
+
+    /*
+    Only deletes users created in the test file:
+    It uses req.user.id which comes from the JWT token, and that token was generated when testUsername logged in. 
+    So it only ever knows about and deletes the user attached to that specific token.
+    It has no way to reach other users because it doesn't loop through all users or delete by anything other than the logged-in user's ID.
+    */
 });
