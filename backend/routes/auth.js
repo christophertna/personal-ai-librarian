@@ -42,6 +42,8 @@ app.use('/api/documents', documentRoutes);
 app.use('/api', askRoutes);
 */
 
+// need to important protect for delete
+const protect  = require('../middleware/authMiddleware');
 
 // REGISTER — POST /api/auth/register
 
@@ -218,6 +220,28 @@ router.post('/login', async (req, res) => {
 
   
 
+});
+
+// DELETE /api/auth/user — delete the logged-in user's account
+router.delete('/user', protect, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // delete chunks first (foreign key constraint)
+    await pool.execute('DELETE FROM chunks WHERE user_id = ?', [userId]);
+    
+    // then documents
+    await pool.execute('DELETE FROM documents WHERE user_id = ?', [userId]);
+    
+    // then the user itself
+    await pool.execute('DELETE FROM users WHERE id = ?', [userId]);
+
+    res.json({ message: 'Account deleted successfully' });
+
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ message: 'Error deleting account' });
+  }
 });
 
 
