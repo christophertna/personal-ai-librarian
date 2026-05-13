@@ -45,7 +45,7 @@ RAG:        User question → Search your DB for relevant text/chunks of texts f
 1. `npm install`
 2. Fill in your `.env` file
 3. Run the SQL in `db/schema.sql` to create your tables
-4. `npm start`
+4. `npm run dev`
 
 ## Learning Goals
 
