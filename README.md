@@ -19,7 +19,7 @@ ai-librarian/
 │   │   └── connection.js      ← MySQL connection setup
 │   └── services/
 │       ├── retrieval.js       ← Searches MySQL for relevant chunks 
-│       ├── augmentation.js    ← Builds the prompt for Gemini (anything gemini named is just OpenAI instead)
+│       ├── augmentation.js    ← Builds the prompt for OpenAI model
 │       └── gemini.js          ← Calls the OpenAI API (originally gemini, but had too many issues)
 ├── frontend/
 │   ├── index.html             ← Login page
@@ -28,13 +28,13 @@ ai-librarian/
 │   │   └── ask.html           ← Ask questions page
 │   └── styles/
 │       └── main.css           ← Tailwind + custom styles
-│── auth.test.js               ← Automated regression test suite using Jest & Supertest              
+├── auth.test.js               ← Automated regression test suite using Jest & Supertest              
 ├── .env
 ├── package-lock.json                     
 └── package.json
 ```
 
-## How RAG Works (Concept)
+## How RAG Works (Learning Concept)
 
 Normal AI: User question → AI answers from memory (can hallucinate/answers too generally)
 
