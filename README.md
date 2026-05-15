@@ -28,7 +28,9 @@ ai-librarian/
 │   │   └── ask.html           ← Ask questions page
 │   └── styles/
 │       └── main.css           ← Tailwind + custom styles
-├── .env                       
+│── auth.test.js               ← Automated regression test suite using Jest & Supertest              
+├── .env
+├── package-lock.json                     
 └── package.json
 ```
 
