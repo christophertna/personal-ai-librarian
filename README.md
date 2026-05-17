@@ -1,6 +1,6 @@
 # 📚 Personal AI Librarian
 
-A beginner/simple Retrieval-Augmented Generation (RAG) application. \n
+A beginner/simple Retrieval-Augmented Generation (RAG) application. <br>
 You ask questions, it searches your document library and gives an AI model (OpenAI) the right context to answer accurately.
 
 ## Project Structure
