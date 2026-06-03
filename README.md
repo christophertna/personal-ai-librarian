@@ -34,7 +34,7 @@ ai-librarian/
 └── package.json
 ```
 
-## How RAG Works (Learning Concept)
+## How RAG Works (Concept)
 
 Normal AI: User question → AI answers from memory (can hallucinate/answers too generally)
 
@@ -55,6 +55,7 @@ RAG:        User question → Search your DB for relevant text/chunks of texts f
 - Understand how to search a database
 - Understand how to build a prompt for an AI
 - Understand how to call an external API
+- Understand how to build an automated regression test suite
 
 ## In Action
 <img width="1919" height="911" alt="Upload Documents" src="https://github.com/user-attachments/assets/6f47660b-4037-4728-84a1-52646fde5ad6" />
