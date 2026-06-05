@@ -1,6 +1,4 @@
--- Run this file in MySQL to set up your tables
--- Command: mysql -u root -p < db/schema.sql
-
+-- Run this file in MySQL to set up db tables: mysql -u root -p < db/schema.sql
 
 CREATE DATABASE IF NOT EXISTS ai_librarian;
 USE ai_librarian;
